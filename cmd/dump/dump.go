@@ -32,11 +32,17 @@ func Run(args []string) error {
 	}
 
 	ctx := context.Background()
-	db, err := model.Open(ctx, output, strings.Split(columns, ";"))
+
+	db, err := model.Open(ctx, output)
 	if err != nil {
 		return err
 	}
 	defer db.Close()
+
+	err = model.Migrate(db, ctx, strings.Split(columns, ";"))
+	if err != nil {
+		return err
+	}
 
 	extensions := strings.Split(ext, ";")
 

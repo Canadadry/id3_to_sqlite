@@ -21,18 +21,21 @@ type File struct {
 	Fields map[string]string
 }
 
-func Open(ctx context.Context, path string, columns []string) (DBTX, error) {
+func Open(ctx context.Context, path string) (DBTX, error) {
 	db, err := sql.Open("sqlite", path)
 	if err != nil {
 		return nil, fmt.Errorf("cannot open database : %w", err)
 	}
 
-	_, err = db.ExecContext(ctx, CreateTableQuery(columns))
-	if err != nil {
-		return nil, fmt.Errorf("cannot create database structure : %w", err)
-	}
-
 	return db, nil
+}
+
+func Migrate(db DBTX, ctx context.Context, columns []string) error {
+	_, err := db.ExecContext(ctx, CreateTableQuery(columns))
+	if err != nil {
+		return fmt.Errorf("cannot create database structure : %w", err)
+	}
+	return nil
 }
 
 func Upsert(db DBTX, ctx context.Context, files []File) error {

@@ -2,6 +2,7 @@ package main
 
 import (
 	"app/cmd/dump"
+	"app/cmd/save"
 	"fmt"
 	"os"
 	"strings"
@@ -17,6 +18,7 @@ func main() {
 func run(args []string) error {
 	actions := map[string]func([]string) error{
 		dump.Action: dump.Run,
+		save.Action: save.Run,
 	}
 
 	listOfAction := make([]string, 0, len(actions))
