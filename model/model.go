@@ -22,7 +22,7 @@ type File struct {
 }
 
 func Open(ctx context.Context, path string, columns []string) (DBTX, error) {
-	db, err := sql.Open("sqlite3", path)
+	db, err := sql.Open("sqlite", path)
 	if err != nil {
 		return nil, fmt.Errorf("cannot open database : %w", err)
 	}
