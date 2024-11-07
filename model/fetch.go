@@ -2,21 +2,8 @@ package model
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 )
-
-type DBTX interface {
-	ExecContext(context.Context, string, ...interface{}) (sql.Result, error)
-	PrepareContext(context.Context, string) (*sql.Stmt, error)
-	QueryContext(context.Context, string, ...interface{}) (*sql.Rows, error)
-	QueryRowContext(context.Context, string, ...interface{}) *sql.Row
-}
-
-type File struct {
-	Name   string
-	Fields map[string]string
-}
 
 func Fetch(db DBTX, ctx context.Context, limit, offset int) ([]File, error) {
 	query := fmt.Sprintf("SELECT * FROM files LIMIT %d OFFSET %d", limit, offset)
