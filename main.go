@@ -37,8 +37,6 @@ func Run(args []string) error {
 		return err
 	}
 
-	fmt.Println(args, entry, output, columns)
-
 	ctx := context.Background()
 	db, err := model.Open(ctx, output, strings.Split(columns, ";"))
 	if err != nil {
@@ -71,7 +69,7 @@ func Run(args []string) error {
 		for _, c := range strings.Split(columns, ";") {
 			f.Fields[c] = tag.GetTextFrame(tag.CommonID(c)).Text
 		}
-		fmt.Println(entry, f)
+
 		err = model.Upsert(db, ctx, []model.File{f})
 		if err != nil {
 			return fmt.Errorf("cannot upsert file %s : %w", path, err)
