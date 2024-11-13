@@ -1,6 +1,7 @@
 package main
 
 import (
+	"app/cmd/convert"
 	"app/cmd/dump"
 	"app/cmd/save"
 	"fmt"
@@ -17,8 +18,9 @@ func main() {
 
 func run(args []string) error {
 	actions := map[string]func([]string) error{
-		dump.Action: dump.Run,
-		save.Action: save.Run,
+		dump.Action:    dump.Run,
+		save.Action:    save.Run,
+		convert.Action: convert.Run,
 	}
 
 	listOfAction := make([]string, 0, len(actions))

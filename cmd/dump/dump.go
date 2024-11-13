@@ -6,6 +6,8 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"io"
+	"os"
 	"strings"
 
 	id3v2 "github.com/bogem/id3v2/v2"
@@ -56,21 +58,28 @@ func Run(args []string) error {
 		if !found {
 			return nil
 		}
-		tag, err := id3v2.Open(path, id3v2.Options{Parse: true})
+		f, err := os.Open(path)
 		if err != nil {
-			return fmt.Errorf("cannot open file : %w", err)
+			return fmt.Errorf("cannot open file %s : %w", path, err)
 		}
-		defer tag.Close()
-		f := model.File{
+		defer f.Close()
+		tag, err := id3v2.ParseReader(f, id3v2.Options{Parse: true})
+		if err != nil {
+			f.Seek(0, io.SeekStart)
+			start := [10]byte{}
+			f.Read(start[:])
+			return fmt.Errorf("cannot parse file %s starting with %v : %w", path, start, err)
+		}
+		mf := model.File{
 			Name:   path,
 			Fields: map[string]string{},
 		}
 
 		for _, c := range strings.Split(columns, ";") {
-			f.Fields[c] = tag.GetTextFrame(tag.CommonID(c)).Text
+			mf.Fields[c] = tag.GetTextFrame(tag.CommonID(c)).Text
 		}
 
-		err = model.Upsert(db, ctx, []model.File{f})
+		err = model.Upsert(db, ctx, []model.File{mf})
 		if err != nil {
 			return fmt.Errorf("cannot upsert file %s : %w", path, err)
 		}
